@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      aspectRatio: {
+        "5/3": "5 / 3",
+      },
       fontFamily: {
         orbitron: ["Orbitron", "sans-serif"],
         "space-mono": ["Space Mono", "monospace"],
@@ -24,5 +27,6 @@ export default {
       },
     },
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
