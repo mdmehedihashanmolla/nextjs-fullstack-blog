@@ -5,7 +5,6 @@ import {
   SheetContent,
   SheetTrigger,
   SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 import {
@@ -31,7 +30,6 @@ const Sidebar = () => {
         </SheetTrigger>
         <SheetContent side="left" className="w-[250px]">
           <SheetHeader>
-            <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           <DashboardSidebar closeSheet={() => setIsOpen(false)} />
         </SheetContent>
