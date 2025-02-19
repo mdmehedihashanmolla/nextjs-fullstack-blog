@@ -39,5 +39,14 @@ export const createArticle = async (prevState:CreateArticleFormState,formData: F
   }
 
   // start creating Articles
+  const imageFile = formData.get('featuredImage') as File | null;
+  if (!imageFile || imageFile?.name === "undefined") {
+    return {
+      errors: {
+        featuredImage: ["Image file is required."],
+      },
+    };
+  }
+
   redirect("/dashboard");
 };
