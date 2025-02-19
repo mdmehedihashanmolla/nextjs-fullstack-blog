@@ -1,11 +1,31 @@
 import Link from "next/link";
 import React from "react";
 import { Button } from "../ui/button";
-import { FileText, MessageCircle, PlusCircle } from "lucide-react";
+import { Clock, FileText, MessageCircle, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import RecentArticles from "./recentarticles";
+import { prisma } from "@/lib/prisma";
 
-const BlogDashboard = () => {
+const BlogDashboard = async () => {
+  const [articles, totalComments] = await Promise.all([
+    prisma.articles.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        comments: true,
+        author: {
+          select: {
+            name: true,
+            email: true,
+            imageUrl: true,
+          },
+        },
+      },
+    }),
+    prisma.comment.count(),
+  ]);
+
   return (
     <main className="flex-1 p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
@@ -32,8 +52,10 @@ const BlogDashboard = () => {
             <FileText className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
-            <p className="text-sm text-muted-foreground mt-1">+5 From last Month</p>
+            <div className="text-2xl font-bold">{articles.length}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              +5 From last Month
+            </p>
           </CardContent>
         </Card>
 
@@ -45,8 +67,10 @@ const BlogDashboard = () => {
             <MessageCircle className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-sm text-muted-foreground mt-1">12 Awaiting Moderation</p>
+            <div className="text-2xl font-bold">{totalComments}</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              12 Awaiting Moderation
+            </p>
           </CardContent>
         </Card>
 
@@ -55,16 +79,18 @@ const BlogDashboard = () => {
             <CardTitle className="font-medium text-sm">
               Average Rating Time
             </CardTitle>
-            <MessageCircle className="h-4 w-4" />
+            <Clock className="h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">4.2</div>
-            <p className="text-sm text-muted-foreground mt-1">0.6 Increase from last Month</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              0.6 Increase from last Month
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      <RecentArticles/>
+      <RecentArticles articles={articles} />
     </main>
   );
 };
