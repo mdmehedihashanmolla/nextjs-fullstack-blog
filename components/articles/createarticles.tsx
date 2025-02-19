@@ -1,16 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import "react-quill-new/dist/quill.snow.css";
 import dynamic from "next/dynamic";
 import { Button } from "../ui/button";
+import { createArticle } from "@/actions/create-article";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const CreateArticlesPage = () => {
   const [content, setContent] = useState("");
+  const [formState,action,isPending] = useActionState(createArticle, {errors:{}})
 
   return (
     <div className="max-w-4xl mx-auto p-6">
