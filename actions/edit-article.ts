@@ -104,7 +104,8 @@ export const editArticle = async (
           },
         };
       }
-    } catch (error) {
+    } catch (err) {
+      console.log(err);
       return {
         errors: {
           formErrors: ["Error Uploading image, Please do try again"],

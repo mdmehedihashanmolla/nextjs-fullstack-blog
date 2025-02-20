@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import {
@@ -12,6 +13,7 @@ import {
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
+import { deleteArticle } from "@/actions/delete-article";
 
 type RecentArticlesProps = {
   articles: Prisma.ArticlesGetPayload<{
@@ -56,34 +58,31 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
             </TableHeader>
 
             <TableBody>
-              {
-                articles.map((article) =>(
-
-              <TableRow key={article.id}>
-                <TableCell>{article.title}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={"secondary"}
-                    className="rounded-full bg-green-100 text-green-800"
-                  >
-                    Published
-                  </Badge>
-                </TableCell>
-                <TableCell>{article.comments.length}</TableCell>
-                <TableCell>{article.createdAt.toDateString()}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Link href={`/dashboard/articles/${article.id}/edit`}>
-                      <Button variant={"ghost"} size={"sm"}>
-                        Edit
-                      </Button>
-                    </Link>
-                    <DeleteButton />
-                  </div>
-                </TableCell>
-              </TableRow>
-                ))
-              }
+              {articles.map((article) => (
+                <TableRow key={article.id}>
+                  <TableCell>{article.title}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={"secondary"}
+                      className="rounded-full bg-green-100 text-green-800"
+                    >
+                      Published
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{article.comments.length}</TableCell>
+                  <TableCell>{article.createdAt.toDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Link href={`/dashboard/articles/${article.id}/edit`}>
+                        <Button variant={"ghost"} size={"sm"}>
+                          Edit
+                        </Button>
+                      </Link>
+                      <DeleteButton articleId={article.id} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>
@@ -94,11 +93,23 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
 
 export default RecentArticles;
 
-const DeleteButton = () => {
+type DeleteButtonProps = {
+  articleId: string;
+};
+
+const DeleteButton: React.FC<DeleteButtonProps> = ({ articleId }) => {
+  const [isPending, startTransition] = useTransition();
+
   return (
-    <form action="">
-      <Button variant={"ghost"} size={"sm"} type="submit">
-        Delete
+    <form
+      action={() => {
+        startTransition(async () => {
+          await deleteArticle(articleId);
+        });
+      }}
+    >
+      <Button disabled={isPending} variant={"ghost"} size={"sm"} type="submit">
+        {isPending ? "Loading..." : "Delete"}
       </Button>
     </form>
   );
