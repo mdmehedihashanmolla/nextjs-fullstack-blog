@@ -114,7 +114,6 @@ export const editArticle = async (
   }
 
   try {
-    // ✅ Fix: Use `existingUser.id` instead of `userId` (which is `clerkUserId`)
     await prisma.articles.update({
       where: { id: articleId },
       data: {
