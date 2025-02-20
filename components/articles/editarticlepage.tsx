@@ -1,34 +1,43 @@
 "use client";
-import React, { FormEvent, startTransition, useActionState, useState } from "react";
+import React, {
+  FormEvent,
+  startTransition,
+  useActionState,
+  useState,
+} from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import "react-quill-new/dist/quill.snow.css";
 import dynamic from "next/dynamic";
 import { Button } from "../ui/button";
-import { createArticle } from "@/actions/create-article";
 import type { Articles } from "@prisma/client";
+import Image from "next/image";
+import { editArticle } from "@/actions/edit-article";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 type EditArticleProps = {
-    article:Articles
-}
+  article: Articles;
+};
 
-const EditArticlePage: React.FC<EditArticleProps> = ({article}) => {
-  const [content, setContent] = useState("");
-  const [formState, action, isPending] = useActionState(createArticle, {
-    errors: {},
-  });
+const EditArticlePage: React.FC<EditArticleProps> = ({ article }) => {
+  const [content, setContent] = useState(article.content);
+  const [formState, action, isPending] = useActionState(
+    editArticle.bind(null, article.id),
+    {
+      errors: {},
+    }
+  );
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     formData.append("content", content);
 
-    startTransition (() =>{
+    startTransition(() => {
       action(formData);
-    })
+    });
   };
 
   return (
@@ -83,6 +92,17 @@ const EditArticlePage: React.FC<EditArticleProps> = ({article}) => {
                 type="file"
                 accept="image/*"
               />
+              <div className="mb-4">
+                {article.featuredImage && (
+                  <Image
+                    src={article.featuredImage}
+                    alt="featured-image"
+                    width={800}
+                    height={600}
+                    className="w-48 h-32 object-cover rounded-md"
+                  />
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -99,7 +119,7 @@ const EditArticlePage: React.FC<EditArticleProps> = ({article}) => {
               <Button variant="outline">Cancel</Button>
 
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Loading..." : "Publish Article"}
+                {isPending ? "Loading..." : "Edit Article"}
               </Button>
             </div>
           </form>
