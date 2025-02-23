@@ -3,7 +3,7 @@ import ArticleSearchInput from "@/components/articles/article-search-input";
 import { Button } from "@/components/ui/button";
 import React from "react";
 
-const page = () => {
+const page = async() => {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-12 sm:px-6 lg:text-5xl">
