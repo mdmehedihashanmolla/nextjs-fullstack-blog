@@ -1,9 +1,15 @@
 import AllArticlePage from "@/components/articles/all-article-page";
 import ArticleSearchInput from "@/components/articles/article-search-input";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { Suspense } from "react";
+import LoadingArticle from "./[id]/loading";
 
-const page = async() => {
+type SearchPageProps = {
+  searchParams: Promise<{ search?: string }>;
+};
+
+const page: React.FC<SearchPageProps> = async ({ searchParams }) => {
+  const searchText = (await searchParams).search || "";
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-12 sm:px-6 lg:text-5xl">
@@ -17,7 +23,9 @@ const page = async() => {
         </div>
 
         {/* All Article Page */}
-        <AllArticlePage/>
+        <Suspense fallback={<h1><LoadingArticle/></h1>}>
+          <AllArticlePage searchText={searchText} />
+        </Suspense>
 
         {/* pagination */}
 
