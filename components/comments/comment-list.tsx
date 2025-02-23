@@ -1,22 +1,41 @@
+import type { Prisma } from "@prisma/client";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-
-const CommentList = () => {
+type CommentListProps = {
+  comments: Prisma.CommentGetPayload<{
+    include: {
+      author: {
+        select: {
+          name: true;
+          email: true;
+          imageUrl: true;
+        };
+      };
+    };
+  }>[];
+};
+const CommentList: React.FC<CommentListProps> = ({ comments }) => {
   return (
     <div className="space-y-8">
-      <div className="flex gap-4">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={""} />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-
-        <div className="flex-1">
-          <div className="mb-2">
-            <span className="font-medium">comment author name</span>
-            <span className="text-sm ml-2">12 feb</span>
+      {comments.map((comment) => (
+        <div key={comment.id} className="flex gap-4">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={comment.author.imageUrl as string} />
+            <AvatarFallback>{comment.author.name}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="mb-2">
+              <span className="font-medium text-foreground">
+                {comment.author.name}
+              </span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {comment.createdAt.toDateString()}
+              </span>
+            </div>
+            <p className="text-muted-foreground">{comment.body}</p>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 };

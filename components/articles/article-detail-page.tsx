@@ -3,6 +3,8 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import LikeButton from "./like-button";
 import CommentList from "../comments/comment-list";
+import CommentInput from "../comments/comment-input";
+import { prisma } from "@/lib/prisma";
 
 type ArticleDetailPageProps = {
   article: Prisma.ArticlesGetPayload<{
@@ -18,7 +20,23 @@ type ArticleDetailPageProps = {
   }>;
 };
 
-const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ article }) => {
+const ArticleDetailPage: React.FC<ArticleDetailPageProps> = async ({
+  article,
+}) => {
+  const comments = await prisma.comment.findMany({
+    where: {
+      articleId: article.id,
+    },
+    include: {
+      author: {
+        select: {
+          name: true,
+          email: true,
+          imageUrl: true,
+        },
+      },
+    },
+  });
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -37,12 +55,12 @@ const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ article }) => {
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarImage src={article.author.imageUrl || undefined} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>MD</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">{article.author.name}</p>
                 <p className="text-sm">
-                  {article.createdAt.toDateString()}12 min read
+                  {article.createdAt.toDateString()} 12 min read
                 </p>
               </div>
             </div>
@@ -54,11 +72,13 @@ const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ article }) => {
 
           {/* Article Action Button */}
 
-          <LikeButton/>
+          <LikeButton />
+
+          <CommentInput articleId={article.id} />
 
           {/* Comment Section */}
 
-        <CommentList/>
+          <CommentList comments={comments} />
         </article>
       </main>
     </div>

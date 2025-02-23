@@ -20,12 +20,14 @@ const page: React.FC<ArticleDetailPageProps> = async ({ params }) => {
       },
     },
   });
-  if(!article){
-    return <h1>Article Not Found</h1>
+  if (!article) {
+    return <h1>Article Not Found</h1>;
   }
-  return <div>
-    <ArticleDetailPage article = {article}/>
-  </div>;
+  return (
+    <div>
+      <ArticleDetailPage article={article} />
+    </div>
+  );
 };
 
 export default page;
